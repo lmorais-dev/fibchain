@@ -5,8 +5,6 @@ edition = { workspace = true }
 
 [dependencies]
 methods = { workspace = true }
-risc0-ethereum-contracts = { workspace = true }
-risc0-zkvm = { workspace = true, default-features = true }
 
 tokio = { version = "1.35", features = ["full"] }
 
@@ -16,10 +14,15 @@ serde = { version = "1.0.218", features = ["derive"] }
 alloy = { workspace = true }
 alloy-primitives = { workspace = true }
 alloy-sol-types = { workspace = true }
+risc0-ethereum-contracts = { workspace = true }
+risc0-zkvm = { workspace = true, default-features = true }
 
 url = { workspace = true }
 hex = { version = "0.4.3" }
 
-anyhow = { workspace = true }
-log = { workspace = true }
-env_logger = { version = "0.11.6" }
+tracing = { version = "0.1.41" }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+
+dotenvy = { version = "0.15.7" }
+color-eyre = { version = "0.6.3" }
+thiserror = { version = "2.0.11" }

@@ -17,5 +17,5 @@ fn main() {
         b += temp;
     }
 
-    env::commit_slice(a.abi_encode().as_slice());
+    env::commit_slice(b.abi_encode().as_slice());
 }
