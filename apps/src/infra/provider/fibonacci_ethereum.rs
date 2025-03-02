@@ -3,7 +3,7 @@ use crate::prelude::{FibchainError, IFibonacci};
 use alloy::network::EthereumWallet;
 use alloy::providers::ProviderBuilder;
 use alloy_primitives::{Address, TxHash};
-use risc0_ethereum_contracts::Seal;
+use alloy_sol_types::SolValue;
 use std::time::Duration;
 use tracing::{error, info, instrument};
 
@@ -33,7 +33,7 @@ impl IFibonacciEthereumProvider for FibonacciEthereumProvider {
     async fn increase_counter(
         &self,
         fibonacci_number: u128,
-        seal: &Seal,
+        seal: Vec<u8>,
     ) -> crate::prelude::Result<TxHash> {
         info!("Sending cryptographic proof to the contract");
         let fill_provider = ProviderBuilder::new()
@@ -48,8 +48,8 @@ impl IFibonacciEthereumProvider for FibonacciEthereumProvider {
             .map_err(|e| {
                 error!(
                     contract = hex::encode(&contract.address().0),
-                    seal = hex::encode(&seal),
-                    journal = hex::encode(&fibonacci_number),
+                    seal = hex::encode(&seal.abi_encode()),
+                    journal = hex::encode(&fibonacci_number.to_ne_bytes()),
                     "Failed to send the proof to the contract: {}",
                     e
                 );
@@ -58,6 +58,8 @@ impl IFibonacciEthereumProvider for FibonacciEthereumProvider {
             })?
             .with_timeout(Some(Duration::from_secs(BLOCKCHAIN_TX_TIMEOUT_SECS as u64)))
             .with_required_confirmations(BLOCKCHAIN_TX_CONFIRMATIONS as u64);
+
+        let transaction_hash = pending_transaction.tx_hash().clone();
 
         info!(
             contract = hex::encode(&contract.address().0),
@@ -69,7 +71,7 @@ impl IFibonacciEthereumProvider for FibonacciEthereumProvider {
         let transaction = pending_transaction.get_receipt().await.map_err(|e| {
             error!(
                 contract = hex::encode(&contract.address().0),
-                transaction_hash = hex::encode(&pending_transaction.tx_hash().0),
+                transaction_hash = hex::encode(transaction_hash.0),
                 "Error while waiting for confirmations: {}",
                 e
             );

@@ -2,6 +2,7 @@ use crate::app::resources::{fibchain_error_to_axum_response, Resource};
 use crate::prelude::*;
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
+use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Json, Router};
 use tracing::instrument;
@@ -40,7 +41,7 @@ impl FibonacciResource {
             Ok(transaction_hash) => {
                 let transaction_hash = hex::encode(transaction_hash);
                 let response = GenerateNumberResponse { transaction_hash };
-                Ok((StatusCode::OK, Json(response)).into())
+                Ok((StatusCode::OK, Json(response)).into_response())
             }
             Err(error) => Ok(fibchain_error_to_axum_response(&error)),
         }

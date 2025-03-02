@@ -1,6 +1,7 @@
 use crate::prelude::{AppState, FibchainError};
 use alloy::transports::http::reqwest::StatusCode;
 use axum::{Json, Router};
+use axum::response::IntoResponse;
 use tracing::error;
 
 pub mod fibonacci;
@@ -26,7 +27,7 @@ pub fn fibchain_error_to_axum_response(error: &FibchainError) -> axum::response:
                 message: message.to_owned(),
             };
 
-            (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into()
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
         }
         FibchainError::Alloy(cause) => {
             error!(
@@ -38,7 +39,7 @@ pub fn fibchain_error_to_axum_response(error: &FibchainError) -> axum::response:
                 message: cause.to_string(),
             };
 
-            (StatusCode::BAD_GATEWAY, Json(response)).into()
+            (StatusCode::BAD_GATEWAY, Json(response)).into_response()
         }
         FibchainError::AlloyPendingTransaction(cause) => {
             error!(
@@ -50,7 +51,7 @@ pub fn fibchain_error_to_axum_response(error: &FibchainError) -> axum::response:
                 message: cause.to_string(),
             };
 
-            (StatusCode::BAD_GATEWAY, Json(response)).into()
+            (StatusCode::BAD_GATEWAY, Json(response)).into_response()
         }
     }
 }

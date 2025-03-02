@@ -2,7 +2,7 @@ use crate::domain::provider::IFibonacciRiscZeroProvider;
 use crate::prelude::FibchainError;
 use alloy_sol_types::SolValue;
 use methods::FIBONACCI_ELF;
-use risc0_ethereum_contracts::{encode_seal, Seal};
+use risc0_ethereum_contracts::encode_seal;
 use risc0_zkvm::{default_prover, ExecutorEnv, ProverOpts, VerifierContext};
 use tracing::{error, info, instrument};
 
@@ -65,7 +65,7 @@ impl IFibonacciRiscZeroProvider for FibonacciRiscZeroProvider {
 
         info!(
             iterations = iterations,
-            input = hex::encode(&receipt),
+            input = hex::encode(&input),
             "Proof generation finished. Extracting seal and journal..."
         );
         let seal = encode_seal(&receipt).map_err(|e| {
@@ -94,7 +94,7 @@ impl IFibonacciRiscZeroProvider for FibonacciRiscZeroProvider {
         info!(
             iterations = iterations,
             input = hex::encode(&input),
-            journal = hex::encode(&journal),
+            journal = hex::encode(&journal.to_ne_bytes()),
             "Proof generated"
         );
         Ok((seal, journal))

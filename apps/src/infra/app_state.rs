@@ -6,6 +6,7 @@ use alloy::signers::local::PrivateKeySigner;
 use alloy_primitives::Address;
 use std::pin::Pin;
 use std::str::FromStr;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -33,8 +34,8 @@ pub fn create_state() -> AppState {
     let fibonacci_risc_zero_provider = FibonacciRiscZeroProvider::new();
 
     let fibonacci_number_generator = FibonacciGenerateNumberUseCase::new(
-        Pin::from(Box::new(fibonacci_risc_zero_provider)),
-        Pin::from(Box::new(fibonacci_ethereum_provider)),
+        Arc::new(Pin::from(Box::new(fibonacci_risc_zero_provider))),
+        Arc::new(Pin::from(Box::new(fibonacci_ethereum_provider))),
     );
 
     AppState {

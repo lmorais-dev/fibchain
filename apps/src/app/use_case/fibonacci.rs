@@ -2,18 +2,19 @@ use crate::domain::provider::{IFibonacciEthereumProvider, IFibonacciRiscZeroProv
 use crate::prelude::*;
 use alloy_primitives::TxHash;
 use std::pin::Pin;
+use std::sync::Arc;
 use tracing::{info, instrument};
 
 #[derive(Clone)]
 pub struct FibonacciGenerateNumberUseCase {
-    fibonacci_risc_zero_provider: Pin<Box<dyn IFibonacciRiscZeroProvider + Sync + Send>>,
-    fibonacci_ethereum_provider: Pin<Box<dyn IFibonacciEthereumProvider + Sync + Send>>,
+    fibonacci_risc_zero_provider: Arc<Pin<Box<dyn IFibonacciRiscZeroProvider + Sync + Send>>>,
+    fibonacci_ethereum_provider: Arc<Pin<Box<dyn IFibonacciEthereumProvider + Sync + Send>>>,
 }
 
 impl FibonacciGenerateNumberUseCase {
     pub fn new(
-        fibonacci_risc_zero_provider: Pin<Box<dyn IFibonacciRiscZeroProvider + Sync + Send>>,
-        fibonacci_ethereum_provider: Pin<Box<dyn IFibonacciEthereumProvider + Sync + Send>>,
+        fibonacci_risc_zero_provider: Arc<Pin<Box<dyn IFibonacciRiscZeroProvider + Sync + Send>>>,
+        fibonacci_ethereum_provider: Arc<Pin<Box<dyn IFibonacciEthereumProvider + Sync + Send>>>,
     ) -> Self {
         Self {
             fibonacci_risc_zero_provider,
@@ -30,7 +31,7 @@ impl FibonacciGenerateNumberUseCase {
             .await?;
 
         self.fibonacci_ethereum_provider
-            .increase_counter(fibonacci_number, &seal)
+            .increase_counter(fibonacci_number, seal)
             .await
     }
 }
