@@ -1,6 +1,9 @@
+use crate::app::resources::fibonacci::FibonacciResource;
+use crate::app::resources::Resource;
 use infra::{app_state, observability};
 
 mod app;
+mod domain;
 mod infra;
 mod prelude;
 
@@ -14,7 +17,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8080").await?;
     let router = axum::Router::new()
-        .merge(app::Fibs::routes())
+        .nest("/fibonacci", FibonacciResource::routes())
         .with_state(state);
 
     axum::serve(listener, router).await.map_err(|e| {

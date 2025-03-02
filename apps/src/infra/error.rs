@@ -4,5 +4,8 @@ pub enum FibchainError {
     ZkVM(String),
 
     #[error(transparent)]
-    StdIo(std::io::Error),
+    Alloy(#[from] alloy::contract::Error),
+
+    #[error(transparent)]
+    AlloyPendingTransaction(#[from] alloy::providers::PendingTransactionError),
 }

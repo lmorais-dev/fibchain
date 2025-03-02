@@ -1,14 +1,15 @@
+use crate::app::use_case::fibonacci::FibonacciGenerateNumberUseCase;
+use crate::infra::provider::fibonacci_ethereum::FibonacciEthereumProvider;
+use crate::infra::provider::fibonacci_risc_zero::FibonacciRiscZeroProvider;
 use alloy::network::EthereumWallet;
 use alloy::signers::local::PrivateKeySigner;
 use alloy_primitives::Address;
+use std::pin::Pin;
 use std::str::FromStr;
-use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub wallet: Arc<EthereumWallet>,
-    pub rpc_url: url::Url,
-    pub contract: Address,
+    pub fibonacci_number_generator: FibonacciGenerateNumberUseCase,
 }
 
 pub fn create_state() -> AppState {
@@ -26,9 +27,17 @@ pub fn create_state() -> AppState {
     let signer = PrivateKeySigner::from_slice(private_key.as_slice()).expect("invalid private key");
     let wallet = EthereumWallet::from(signer);
 
+    let fibonacci_ethereum_provider =
+        FibonacciEthereumProvider::new(wallet.clone(), contract_address.clone(), rpc_url);
+
+    let fibonacci_risc_zero_provider = FibonacciRiscZeroProvider::new();
+
+    let fibonacci_number_generator = FibonacciGenerateNumberUseCase::new(
+        Pin::from(Box::new(fibonacci_risc_zero_provider)),
+        Pin::from(Box::new(fibonacci_ethereum_provider)),
+    );
+
     AppState {
-        wallet: Arc::new(wallet),
-        rpc_url,
-        contract: contract_address,
+        fibonacci_number_generator,
     }
 }
