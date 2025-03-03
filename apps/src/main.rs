@@ -11,7 +11,7 @@ mod prelude;
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
     color_eyre::install().ok();
-    observability::setup_tracing();
+    let _guard = observability::setup_tracing();
 
     let state = app_state::create_state();
 

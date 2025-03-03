@@ -54,6 +54,7 @@ of this technical challenge.
 * Use message signing with Wallet Connect to avoid storing and manipulating the user's private keys.
 * Add CI/CD pipelines to automatically test and deploy both the contract and the host application.
 * No input and output validation in both contract and host applications.
+* Span and Log collection are enabled and working, but no metrics (counters, gauges, etc.) are set up.
 
 ## Running the application
 
@@ -63,6 +64,7 @@ of this technical challenge.
 * [Risc Zero zkVM](https://dev.risczero.com/api/zkvm/install)
 * [Alchemy Account (if deploying into the testnet and/or mainnet)](https://www.alchemy.com)
 * [Bonsai Account (if offloading proofing)](https://bonsai.xyz)
+* [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)
 
 First step is to deploy the smart contract, to do that we need to set up two environment variables: `RPC_URL` and
 `ETH_WALLET_PRIVATE_KEY`.
@@ -100,8 +102,15 @@ Use the `Fibonacci` address to set the `ETH_CONTRACT` environment variable.
 export ETH_CONTRACT=0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
 ```
 
-We are done with the first part, now with these environment variables set we can start the main application. We can
-optionally set Bonsai environment variables to offload computation from the web server:
+We are done with the first part, now with these environment variables set, we can now proceed to set the
+`OTEL_EXPORTER_URL` environment variable which must point to a gRPC enabled OTel Collector instance. 
+
+```bash
+#!/bin/bash
+export OTEL_EXPORTER_URL="http://localhost:4317"
+```
+
+We can optionally set Bonsai environment variables to offload computation from the web server:
 
 ```bash
 #!/bin/bash
@@ -128,7 +137,7 @@ A successful response will look like this:
 }
 ```
 
-Optionally you might want to query the contract internal counter state, to do that use this command:
+Optionally, you might want to query the contract internal counter state, to do that use this command:
 
 ```bash
 #!/bin/bash
