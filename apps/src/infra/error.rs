@@ -8,4 +8,7 @@ pub enum FibchainError {
 
     #[error(transparent)]
     AlloyPendingTransaction(#[from] alloy::providers::PendingTransactionError),
+
+    #[error(transparent)]
+    Generic(#[from] color_eyre::Report),
 }

@@ -1,7 +1,7 @@
 use crate::prelude::{AppState, FibchainError};
 use alloy::transports::http::reqwest::StatusCode;
-use axum::{Json, Router};
 use axum::response::IntoResponse;
+use axum::{Json, Router};
 use tracing::error;
 
 pub mod fibonacci;
@@ -52,6 +52,18 @@ pub fn fibchain_error_to_axum_response(error: &FibchainError) -> axum::response:
             };
 
             (StatusCode::BAD_GATEWAY, Json(response)).into_response()
+        }
+        FibchainError::Generic(message) => {
+            error!(
+                "Failed to generate fibonacci number due to a generic error: {}",
+                message
+            );
+
+            let response = ErrorMessageResponse {
+                message: message.to_string(),
+            };
+
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
         }
     }
 }
