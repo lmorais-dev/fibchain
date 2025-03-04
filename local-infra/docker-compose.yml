@@ -1,0 +1,65 @@
+networks:
+  local-infra:
+
+volumes:
+  grafana:
+  loki:
+  tempo:
+  prometheus:
+    
+services:
+  grafana:
+    image: grafana/grafana-oss
+    restart: always
+    networks:
+      - local-infra
+    ports:
+      - '40001:3000'
+    volumes:
+      - grafana:/var/lib/grafana
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: always
+    networks:
+      - local-infra
+    ports:
+      - "40002:3100"
+    volumes:
+      - loki:/loki
+  
+  tempo:
+    image: grafana/tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    restart: always
+    networks:
+      - local-infra
+    ports:
+      - '40003:3200'
+      - '40004:4317'
+    volumes:
+      - ./config/tempo.yaml:/etc/tempo.yaml
+      - tempo:/var/tempo
+    depends_on:
+      - prometheus
+
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    networks:
+      - local-infra
+    ports:
+      - '40005:9090'
+    volumes:
+      - prometheus:/prometheus      
+
+  otel_collector:
+    image: otel/opentelemetry-collector-contrib:0.120.0
+    restart: always
+    networks:
+      - local-infra
+    ports:
+      - '40006:4317'
+    volumes:
+      - ./config/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml

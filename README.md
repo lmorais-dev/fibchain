@@ -103,11 +103,19 @@ export ETH_CONTRACT=0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
 ```
 
 We are done with the first part, now with these environment variables set, we can now proceed to set the
-`OTEL_EXPORTER_URL` environment variable which must point to a gRPC enabled OTel Collector instance. 
+`OTEL_EXPORTER_URL` environment variable which must point to a gRPC enabled OTel Collector instance.
+
+A docker compose script is provided at the `local-infra` with `otel-collector`, `grafana-loki`, `grafana-tempo`,
+`prometheus` and `grafana-oss`.
+
+The default credentials for the grafana instance are `admin` for both username and password.
+Use the explore function to confirm trace, logs and metrics collection. 
 
 ```bash
 #!/bin/bash
 export OTEL_EXPORTER_URL="http://localhost:4317"
+
+cd local-infra && docker compose up -d && cd ..
 ```
 
 We can optionally set Bonsai environment variables to offload computation from the web server:
